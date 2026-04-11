@@ -1,51 +1,37 @@
-name: Stock Monitor
+import os
+import requests
+import yfinance as yf
 
-on:
-  schedule:
-    - cron: "*/10 * * * *"
-  workflow_dispatch:
+WEBHOOK = os.getenv("DISCORD_WEBHOOK_URL")
+TICKERS = [x.strip() for x in os.getenv("PORTFOLIO_TICKERS", "AAPL,MSFT").split(",") if x.strip()]
 
-jobs:
-  run:
-    runs-on: ubuntu-latest
+def send(msg):
+    if not WEBHOOK:
+        print("DISCORD_WEBHOOK_URL missing")
+        return
+    r = requests.post(WEBHOOK, json={"content": msg})
+    print("discord status:", r.status_code)
+    print("discord body:", r.text[:200])
 
-    steps:
-      - uses: actions/checkout@v4
+def check():
+    results = []
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+    if not WEBHOOK:
+        print("WEBHOOK is empty")
+        return
 
-      - name: Install
-        run: pip install -r requirements.txt
+    for t in TICKERS:
+        try:
+            data = yf.Ticker(t)
+            price = data.fast_info.get("lastPrice")
+            if price:
+                results.append(f"{t}: {price}")
+            else:
+                results.append(f"{t}: 데이터 없음")
+        except Exception as e:
+            results.append(f"{t}: 오류 - {str(e)}")
 
-      - name: Check webhook exists
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        run: |
-          if [ -z "$DISCORD_WEBHOOK_URL" ]; then
-            echo "WEBHOOK_MISSING"
-            exit 1
-          else
-            echo "WEBHOOK_OK"
-          fi
+    send("📩 자동 테스트 메시지\n" + "\n".join(results))
 
-      - name: Direct Discord test
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        run: |
-          python - <<'PY'
-          import os, requests
-          url = os.environ["DISCORD_WEBHOOK_URL"]
-          r = requests.post(url, json={"content": "✅ GitHub Actions 직접 테스트 메시지"})
-          print("status:", r.status_code)
-          print("body:", r.text[:200])
-          r.raise_for_status()
-          PY
-
-      - name: Run script
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          PORTFOLIO_TICKERS: AAPL,MSFT,NVDA
-        run: python stock_monitor_github.py
+if __name__ == "__main__":
+    check()
