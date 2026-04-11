@@ -2,7 +2,7 @@ import os
 import requests
 import yfinance as yf
 
-WEBHOOK = os.getenv("DISCORD_WEBHOOK_URL")
+WEBHOOK = os.getenv("https://discord.com/api/webhooks/1492557189032710397/Mof5dG8AvxwWvWwT17GnHH3L9zdVUISar9wzIEaINt2pC36EbPBiQgn4b6x4mT_QkdGE")
 TICKERS = os.getenv("PORTFOLIO_TICKERS", "AAPL,MSFT").split(",")
 
 def send(msg):
