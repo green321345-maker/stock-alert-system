@@ -1,0 +1,16 @@
+name: Stock Monitor
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install
+        run: pip install -r requirements.txt
+      - name: Run script
+        run: python stock_monitor_github.py
