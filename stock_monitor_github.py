@@ -17,10 +17,13 @@ def check():
             price = data.fast_info.get("lastPrice")
             if price:
                 results.append(f"{t}: {price}")
-        except:
-            pass
-    if results:
-        send("\n".join(results))
+            else:
+                results.append(f"{t}: 데이터 없음")
+        except Exception as e:
+            results.append(f"{t}: 오류")
+
+    # 👉 무조건 보내게 변경
+    send("\n".join(results))
 
 if __name__ == "__main__":
     check()
