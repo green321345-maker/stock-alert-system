@@ -2,7 +2,7 @@ import os
 import requests
 import yfinance as yf
 
-WEBHOOK = os.getenv("https://discord.com/api/webhooks/1492557189032710397/Mof5dG8AvxwWvWwT17GnHH3L9zdVUISar9wzIEaINt2pC36EbPBiQgn4b6x4mT_QkdGE")
+WEBHOOK = os.getenv("DISCORD_WEBHOOK_URL")
 TICKERS = os.getenv("PORTFOLIO_TICKERS", "AAPL,MSFT").split(",")
 
 def send(msg):
@@ -11,8 +11,14 @@ def send(msg):
 
 def check():
     results = []
+
+    if not WEBHOOK:
+        print("DISCORD_WEBHOOK_URL missing")
+        return
+
     for t in TICKERS:
         try:
+            t = t.strip()
             data = yf.Ticker(t)
             price = data.fast_info.get("lastPrice")
             if price:
@@ -20,10 +26,9 @@ def check():
             else:
                 results.append(f"{t}: 데이터 없음")
         except Exception as e:
-            results.append(f"{t}: 오류")
+            results.append(f"{t}: 오류 - {str(e)}")
 
-    # 👉 무조건 보내게 변경
-    send("\n".join(results))
+    send("테스트 메시지\\n" + "\\n".join(results))
 
 if __name__ == "__main__":
     check()
