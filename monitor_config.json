@@ -1,0 +1,7 @@
+{
+  "tickers": ["AAPL", "MSFT", "NVDA"],
+  "analysis_period": "1y",
+  "movement_threshold": 1,
+  "enable_buy_alert": true,
+  "enable_sell_alert": true
+}
