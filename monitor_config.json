@@ -1,7 +1,13 @@
 {
   "tickers": [
     "GSL",
-    "RNR"
+    "RNR",
+    "000660.KS",
+    "MU",
+    "005930.KS",
+    "GOOGLE",
+    "APH",
+    "JNJ"
   ],
   "analysis_period": "1y",
   "movement_threshold": 1,
