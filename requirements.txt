@@ -1,3 +1,9 @@
+streamlit
 yfinance
-requests
 pandas
+numpy
+plotly
+requests
+pykrx
+lxml
+html5lib
