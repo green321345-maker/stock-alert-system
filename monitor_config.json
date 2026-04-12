@@ -1,5 +1,8 @@
 {
-  "tickers": ["AAPL", "MSFT", "NVDA"],
+  "tickers": [
+    "GSL",
+    "RNR"
+  ],
   "analysis_period": "1y",
   "movement_threshold": 1,
   "enable_buy_alert": true,
