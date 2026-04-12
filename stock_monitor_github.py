@@ -1,37 +1,27 @@
-import os
 import json
-import requests
+import os
+from pathlib import Path
+
 import pandas as pd
+import requests
 import yfinance as yf
 
+CONFIG_FILE = Path("monitor_config.json")
+STATE_FILE = Path("state.json")
 WEBHOOK = os.getenv("DISCORD_WEBHOOK_URL", "").strip()
-TICKERS = [x.strip().upper() for x in os.getenv("PORTFOLIO_TICKERS", "").split(",") if x.strip()]
-ANALYSIS_PERIOD = os.getenv("ANALYSIS_PERIOD", "1y").strip()
-STATE_FILE = "state.json"
 
 
-def load_state():
-    if not os.path.exists(STATE_FILE):
-        return {}
+def load_json(path: Path, default):
     try:
-        with open(STATE_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception:
-        return {}
+        if path.exists():
+            return json.loads(path.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"failed to load {path}: {e}")
+    return default
 
 
-def save_state(state):
-    with open(STATE_FILE, "w", encoding="utf-8") as f:
-        json.dump(state, f, ensure_ascii=False, indent=2)
-
-
-def send(msg):
-    if not WEBHOOK:
-        print("DISCORD_WEBHOOK_URL missing")
-        return
-    r = requests.post(WEBHOOK, json={"content": msg[:1900]}, timeout=10)
-    print("discord status:", r.status_code)
-    print("discord body:", r.text[:200])
+def save_json(path: Path, data) -> None:
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def safe_float(v):
@@ -53,20 +43,29 @@ def fmt_price(v):
     return f"{int(round(float(v))):,}"
 
 
-def price_unit(ticker):
+def price_unit(ticker: str) -> str:
     if ticker.endswith(".KS") or ticker.endswith(".KQ"):
         return "원"
     return "달러"
 
 
-def get_ma(close, window):
+def send_discord(message: str) -> None:
+    if not WEBHOOK:
+        raise RuntimeError("DISCORD_WEBHOOK_URL missing")
+    r = requests.post(WEBHOOK, json={"content": message[:1900]}, timeout=10)
+    print("discord status:", r.status_code)
+    print("discord body:", r.text[:200])
+    r.raise_for_status()
+
+
+def get_ma(close: pd.Series, window: int):
     if close is None or len(close) < window:
         return None
     val = close.rolling(window).mean().iloc[-1]
     return float(val) if not pd.isna(val) else None
 
 
-def calc_rsi(close, period=14):
+def calc_rsi(close: pd.Series, period: int = 14):
     if close is None or len(close) < period + 1:
         return None
     delta = close.diff()
@@ -78,7 +77,7 @@ def calc_rsi(close, period=14):
     return float(val) if not pd.isna(val) else None
 
 
-def buy_score(price, hist):
+def buy_score(price, hist: pd.DataFrame) -> int:
     if hist is None or hist.empty or "Close" not in hist.columns:
         return 0
 
@@ -91,10 +90,8 @@ def buy_score(price, hist):
 
     if ma50 is not None and price is not None and price > ma50:
         score += 1
-
     if ma50 is not None and ma200 is not None and ma50 > ma200:
         score += 2
-
     if rsi is not None:
         if rsi < 35:
             score += 2
@@ -104,7 +101,7 @@ def buy_score(price, hist):
     return score
 
 
-def sell_score(price, hist):
+def sell_score(price, hist: pd.DataFrame) -> int:
     if hist is None or hist.empty or "Close" not in hist.columns:
         return 0
 
@@ -127,91 +124,103 @@ def sell_score(price, hist):
     return score
 
 
-def signal_text(buy, sell):
-    # 한 종목당 하나의 신호만 보내기
-    if buy >= sell + 1 and buy >= 2:
+def signal_text(buy: int, sell: int, buy_diff: int, sell_diff: int, enable_buy: bool, enable_sell: bool, threshold: int):
+    if enable_buy and buy_diff >= threshold and buy > sell:
         return "매수 신호"
-    if sell >= buy + 1 and sell >= 2:
+    if enable_sell and sell_diff >= threshold and sell > buy:
         return "매도 신호"
     return None
 
 
-def analyze(ticker):
+def analyze_ticker(ticker: str, analysis_period: str):
     try:
-        s = yf.Ticker(ticker)
-        hist = s.history(period=ANALYSIS_PERIOD, auto_adjust=False, actions=True)
+        stock = yf.Ticker(ticker)
+        hist = stock.history(period=analysis_period, auto_adjust=False, actions=True)
         if hist.empty:
             return None
 
         price = safe_float(hist["Close"].iloc[-1])
         buy = buy_score(price, hist)
         sell = sell_score(price, hist)
-        signal = signal_text(buy, sell)
 
         return {
             "price": price,
             "buy": buy,
             "sell": sell,
-            "signal": signal,
         }
     except Exception as e:
-        print(f"{ticker} error:", e)
+        print(f"{ticker} analyze failed: {e}")
         return None
 
 
 def main():
-    if not WEBHOOK:
-        raise RuntimeError("DISCORD_WEBHOOK_URL missing")
-
-    if not TICKERS:
-        raise RuntimeError("PORTFOLIO_TICKERS missing")
-
-    old_state = load_state()
+    config = load_json(
+        CONFIG_FILE,
+        {
+            "tickers": ["AAPL", "MSFT", "NVDA"],
+            "analysis_period": "1y",
+            "movement_threshold": 1,
+            "enable_buy_alert": True,
+            "enable_sell_alert": True,
+        },
+    )
+    old_state = load_json(STATE_FILE, {})
     new_state = {}
 
-    for ticker in TICKERS:
-        result = analyze(ticker)
+    tickers = [str(x).strip().upper() for x in config.get("tickers", []) if str(x).strip()]
+    analysis_period = str(config.get("analysis_period", "1y")).strip()
+    threshold = int(config.get("movement_threshold", 1))
+    enable_buy = bool(config.get("enable_buy_alert", True))
+    enable_sell = bool(config.get("enable_sell_alert", True))
+
+    if not tickers:
+        print("no tickers configured")
+        return
+
+    messages = []
+
+    for ticker in tickers:
+        result = analyze_ticker(ticker, analysis_period)
         if not result:
+            continue
+
+        prev = old_state.get(ticker, {"buy": 0, "sell": 0})
+        buy_diff = result["buy"] - int(prev.get("buy", 0))
+        sell_diff = result["sell"] - int(prev.get("sell", 0))
+
+        signal = signal_text(
+            buy=result["buy"],
+            sell=result["sell"],
+            buy_diff=buy_diff,
+            sell_diff=sell_diff,
+            enable_buy=enable_buy,
+            enable_sell=enable_sell,
+            threshold=threshold,
+        )
+
+        new_state[ticker] = {
+            "buy": result["buy"],
+            "sell": result["sell"],
+            "last_signal": signal,
+        }
+
+        if signal is None:
             continue
 
         price = fmt_price(result["price"])
         unit = price_unit(ticker)
-        signal = result["signal"]
-        buy = result["buy"]
-        sell = result["sell"]
+        messages.append(
+            f"{ticker} {price}{unit} · {signal} · 매수 {result['buy']} / 매도 {result['sell']}"
+        )
 
-        prev = old_state.get(ticker, {})
-        prev_signal = prev.get("signal")
-        prev_buy = prev.get("buy")
-        prev_sell = prev.get("sell")
+    save_json(STATE_FILE, new_state)
 
-        # 신호가 없으면 저장만 하고 알림은 안 보냄
-        if signal is None:
-            new_state[ticker] = {
-                "signal": None,
-                "buy": buy,
-                "sell": sell,
-            }
-            continue
+    if not messages:
+        print("no alert to send")
+        return
 
-        # 같은 신호 + 같은 점수면 다시 보내지 않음
-        if prev_signal == signal and prev_buy == buy and prev_sell == sell:
-            new_state[ticker] = {
-                "signal": signal,
-                "buy": buy,
-                "sell": sell,
-            }
-            continue
-
-        send(f"{ticker} {price}{unit} · {signal} · 매수 {buy} / 매도 {sell}")
-
-        new_state[ticker] = {
-            "signal": signal,
-            "buy": buy,
-            "sell": sell,
-        }
-
-    save_state(new_state)
+    for msg in messages:
+        send_discord(msg)
 
 
 if __name__ == "__main__":
