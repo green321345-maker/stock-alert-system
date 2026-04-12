@@ -5,7 +5,7 @@ import pandas as pd
 import yfinance as yf
 
 WEBHOOK = os.getenv("DISCORD_WEBHOOK_URL", "").strip()
-TICKERS = [x.strip().upper() for x in os.getenv("PORTFOLIO_TICKERS", "AAPL,MSFT,NVDA").split(",") if x.strip()]
+TICKERS = [x.strip().upper() for x in os.getenv("PORTFOLIO_TICKERS", "").split(",") if x.strip()]
 ANALYSIS_PERIOD = os.getenv("ANALYSIS_PERIOD", "1y").strip()
 STATE_FILE = "state.json"
 
@@ -127,6 +127,15 @@ def sell_score(price, hist):
     return score
 
 
+def signal_text(buy, sell):
+    # 한 종목당 하나의 신호만 보내기
+    if buy >= sell + 1 and buy >= 2:
+        return "매수 신호"
+    if sell >= buy + 1 and sell >= 2:
+        return "매도 신호"
+    return None
+
+
 def analyze(ticker):
     try:
         s = yf.Ticker(ticker)
@@ -135,13 +144,15 @@ def analyze(ticker):
             return None
 
         price = safe_float(hist["Close"].iloc[-1])
-        b = buy_score(price, hist)
-        s_ = sell_score(price, hist)
+        buy = buy_score(price, hist)
+        sell = sell_score(price, hist)
+        signal = signal_text(buy, sell)
 
         return {
             "price": price,
-            "buy": b,
-            "sell": s_,
+            "buy": buy,
+            "sell": sell,
+            "signal": signal,
         }
     except Exception as e:
         print(f"{ticker} error:", e)
@@ -149,29 +160,56 @@ def analyze(ticker):
 
 
 def main():
-    state = load_state()
+    if not WEBHOOK:
+        raise RuntimeError("DISCORD_WEBHOOK_URL missing")
+
+    if not TICKERS:
+        raise RuntimeError("PORTFOLIO_TICKERS missing")
+
+    old_state = load_state()
     new_state = {}
 
     for ticker in TICKERS:
-        data = analyze(ticker)
-        if not data:
+        result = analyze(ticker)
+        if not result:
             continue
 
-        prev = state.get(ticker, {"buy": 0, "sell": 0})
-
-        buy_diff = data["buy"] - prev.get("buy", 0)
-        sell_diff = data["sell"] - prev.get("sell", 0)
-
-        price = fmt_price(data["price"])
+        price = fmt_price(result["price"])
         unit = price_unit(ticker)
+        signal = result["signal"]
+        buy = result["buy"]
+        sell = result["sell"]
 
-        if buy_diff >= 1:
-            send(f"{ticker} {price}{unit} · 매수 신호")
+        prev = old_state.get(ticker, {})
+        prev_signal = prev.get("signal")
+        prev_buy = prev.get("buy")
+        prev_sell = prev.get("sell")
 
-        if sell_diff >= 1:
-            send(f"{ticker} {price}{unit} · 매도 신호")
+        # 신호가 없으면 저장만 하고 알림은 안 보냄
+        if signal is None:
+            new_state[ticker] = {
+                "signal": None,
+                "buy": buy,
+                "sell": sell,
+            }
+            continue
 
-        new_state[ticker] = data
+        # 같은 신호 + 같은 점수면 다시 보내지 않음
+        if prev_signal == signal and prev_buy == buy and prev_sell == sell:
+            new_state[ticker] = {
+                "signal": signal,
+                "buy": buy,
+                "sell": sell,
+            }
+            continue
+
+        send(f"{ticker} {price}{unit} · {signal} · 매수 {buy} / 매도 {sell}")
+
+        new_state[ticker] = {
+            "signal": signal,
+            "buy": buy,
+            "sell": sell,
+        }
 
     save_state(new_state)
 
