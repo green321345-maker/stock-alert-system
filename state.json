@@ -2,16 +2,16 @@
   "AAPL": {
     "buy": 2,
     "sell": 1,
-    "last_signal": "매수 신호"
+    "last_signal": null
   },
   "MSFT": {
     "buy": 1,
     "sell": 2,
-    "last_signal": "매도 신호"
+    "last_signal": null
   },
   "NVDA": {
     "buy": 3,
     "sell": 1,
-    "last_signal": "매수 신호"
+    "last_signal": null
   }
 }
