@@ -1,3 +1,4 @@
-yfinance
+streamlit
 requests
 pandas
+yfinance
