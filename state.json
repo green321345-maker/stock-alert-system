@@ -6,11 +6,11 @@
   },
   "RNR": {
     "buy": 3,
-    "sell": 1,
+    "sell": 0,
     "last_signal": null
   },
   "000660.KS": {
-    "buy": 3,
+    "buy": 2,
     "sell": 2,
     "last_signal": null
   },
@@ -20,13 +20,13 @@
     "last_signal": null
   },
   "005930.KS": {
-    "buy": 3,
-    "sell": 0,
+    "buy": 2,
+    "sell": 1,
     "last_signal": null
   },
   "APH": {
     "buy": 3,
-    "sell": 2,
+    "sell": 1,
     "last_signal": null
   },
   "JNJ": {
