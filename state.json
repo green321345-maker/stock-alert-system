@@ -1,7 +1,7 @@
 {
   "GSL": {
     "buy": 3,
-    "sell": 2,
+    "sell": 1,
     "last_signal": null
   },
   "RNR": {
@@ -30,7 +30,7 @@
     "last_signal": null
   },
   "JNJ": {
-    "buy": 3,
+    "buy": 2,
     "sell": 0,
     "last_signal": null
   }
