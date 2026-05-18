@@ -5,7 +5,7 @@
     "last_signal": null
   },
   "RNR": {
-    "buy": 4,
+    "buy": 3,
     "sell": 0,
     "last_signal": null
   },
@@ -30,8 +30,8 @@
     "last_signal": null
   },
   "JNJ": {
-    "buy": 2,
+    "buy": 3,
     "sell": 0,
-    "last_signal": null
+    "last_signal": "매수 신호"
   }
 }
