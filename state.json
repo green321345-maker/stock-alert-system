@@ -1,6 +1,6 @@
 {
   "GSL": {
-    "buy": 3,
+    "buy": 2,
     "sell": 1,
     "last_signal": null
   },
@@ -11,11 +11,11 @@
   },
   "000660.KS": {
     "buy": 3,
-    "sell": 0,
+    "sell": 1,
     "last_signal": null
   },
   "MU": {
-    "buy": 3,
+    "buy": 2,
     "sell": 1,
     "last_signal": null
   },
@@ -25,12 +25,12 @@
     "last_signal": null
   },
   "APH": {
-    "buy": 3,
+    "buy": 2,
     "sell": 1,
     "last_signal": null
   },
   "JNJ": {
-    "buy": 3,
+    "buy": 2,
     "sell": 0,
     "last_signal": null
   }
