@@ -7,7 +7,7 @@
   "RNR": {
     "buy": 3,
     "sell": 0,
-    "last_signal": "매수 신호"
+    "last_signal": null
   },
   "000660.KS": {
     "buy": 3,
@@ -17,7 +17,7 @@
   "MU": {
     "buy": 3,
     "sell": 0,
-    "last_signal": "매수 신호"
+    "last_signal": null
   },
   "005930.KS": {
     "buy": 3,
@@ -27,11 +27,11 @@
   "APH": {
     "buy": 3,
     "sell": 1,
-    "last_signal": "매수 신호"
+    "last_signal": null
   },
   "JNJ": {
     "buy": 3,
     "sell": 0,
-    "last_signal": "매수 신호"
+    "last_signal": null
   }
 }
