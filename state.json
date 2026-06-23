@@ -17,16 +17,16 @@
   "MU": {
     "buy": 4,
     "sell": 0,
-    "last_signal": "매수 신호"
+    "last_signal": null
   },
   "005930.KS": {
     "buy": 4,
     "sell": 0,
-    "last_signal": "매수 신호"
+    "last_signal": null
   },
   "APH": {
     "buy": 3,
-    "sell": 1,
+    "sell": 0,
     "last_signal": null
   },
   "JNJ": {
