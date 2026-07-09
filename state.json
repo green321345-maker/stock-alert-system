@@ -1,7 +1,7 @@
 {
   "GSL": {
     "buy": 3,
-    "sell": 0,
+    "sell": 1,
     "last_signal": null
   },
   "RNR": {
@@ -25,7 +25,7 @@
     "last_signal": null
   },
   "APH": {
-    "buy": 4,
+    "buy": 3,
     "sell": 0,
     "last_signal": null
   },
