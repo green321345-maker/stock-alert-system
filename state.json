@@ -15,7 +15,7 @@
     "last_signal": null
   },
   "MU": {
-    "buy": 5,
+    "buy": 4,
     "sell": 0,
     "last_signal": null
   },
@@ -31,7 +31,7 @@
   },
   "JNJ": {
     "buy": 3,
-    "sell": 2,
+    "sell": 1,
     "last_signal": null
   }
 }
