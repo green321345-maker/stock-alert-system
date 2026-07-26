@@ -1,8 +1,8 @@
 {
   "GSL": {
-    "buy": 2,
+    "buy": 3,
     "sell": 2,
-    "last_signal": null
+    "last_signal": "매수 신호"
   },
   "RNR": {
     "buy": 3,
@@ -15,9 +15,9 @@
     "last_signal": null
   },
   "MU": {
-    "buy": 2,
+    "buy": 3,
     "sell": 0,
-    "last_signal": null
+    "last_signal": "매수 신호"
   },
   "005930.KS": {
     "buy": 4,
@@ -25,9 +25,9 @@
     "last_signal": null
   },
   "APH": {
-    "buy": 3,
+    "buy": 5,
     "sell": 0,
-    "last_signal": null
+    "last_signal": "매수 신호"
   },
   "JNJ": {
     "buy": 3,
