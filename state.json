@@ -1,4 +1,9 @@
 {
+  "GSL": {
+    "buy": 4,
+    "sell": 0,
+    "last_signal": "매수 신호"
+  },
   "RNR": {
     "buy": 4,
     "sell": 0,
