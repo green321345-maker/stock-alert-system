@@ -2,7 +2,7 @@
   "GSL": {
     "buy": 5,
     "sell": 0,
-    "last_signal": "매수 신호"
+    "last_signal": null
   },
   "RNR": {
     "buy": 4,
@@ -20,7 +20,7 @@
     "last_signal": null
   },
   "005930.KS": {
-    "buy": 3,
+    "buy": 2,
     "sell": 0,
     "last_signal": null
   },
