@@ -16,8 +16,8 @@
   },
   "MU": {
     "buy": 3,
-    "sell": 1,
-    "last_signal": "매수 신호"
+    "sell": 2,
+    "last_signal": null
   },
   "005930.KS": {
     "buy": 2,
