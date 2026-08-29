@@ -1,11 +1,11 @@
 {
   "GSL": {
-    "buy": 3,
+    "buy": 2,
     "sell": 1,
     "last_signal": null
   },
   "RNR": {
-    "buy": 3,
+    "buy": 2,
     "sell": 1,
     "last_signal": null
   },
@@ -21,7 +21,7 @@
   },
   "005930.KS": {
     "buy": 2,
-    "sell": 1,
+    "sell": 0,
     "last_signal": null
   },
   "APH": {
@@ -30,7 +30,7 @@
     "last_signal": null
   },
   "JNJ": {
-    "buy": 3,
+    "buy": 2,
     "sell": 0,
     "last_signal": null
   }
