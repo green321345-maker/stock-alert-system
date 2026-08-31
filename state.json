@@ -1,7 +1,7 @@
 {
   "GSL": {
     "buy": 3,
-    "sell": 1,
+    "sell": 2,
     "last_signal": null
   },
   "RNR": {
@@ -16,7 +16,7 @@
   },
   "MU": {
     "buy": 2,
-    "sell": 0,
+    "sell": 1,
     "last_signal": null
   },
   "005930.KS": {
