@@ -1,6 +1,6 @@
 {
   "GSL": {
-    "buy": 4,
+    "buy": 3,
     "sell": 0,
     "last_signal": null
   },
@@ -12,10 +12,10 @@
   "000660.KS": {
     "buy": 4,
     "sell": 0,
-    "last_signal": "매수 신호"
+    "last_signal": null
   },
   "MU": {
-    "buy": 3,
+    "buy": 2,
     "sell": 1,
     "last_signal": null
   },
@@ -25,13 +25,13 @@
     "last_signal": null
   },
   "APH": {
-    "buy": 3,
+    "buy": 2,
     "sell": 0,
     "last_signal": null
   },
   "JNJ": {
-    "buy": 4,
+    "buy": 3,
     "sell": 0,
-    "last_signal": "매수 신호"
+    "last_signal": null
   }
 }
