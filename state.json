@@ -31,7 +31,7 @@
   },
   "JNJ": {
     "buy": 3,
-    "sell": 1,
-    "last_signal": "매수 신호"
+    "sell": 0,
+    "last_signal": null
   }
 }
